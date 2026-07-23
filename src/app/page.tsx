@@ -4,20 +4,25 @@ import React from 'react';
 import AppShell from '@/components/layout/AppShell';
 import RepoUrlInput from '@/components/input/RepoUrlInput';
 import QuickSummaryCard from '@/components/quick-summary/QuickSummaryCard';
+import AnalysisProgressStepper from '@/components/progress/AnalysisProgressStepper';
 import SectionCard from '@/components/shared/SectionCard';
 import TagChip from '@/components/shared/TagChip';
 import { useAppStore } from '@/stores/appStore';
-import { Sparkles, Layers, Lock } from 'lucide-react';
-import { Typography, Alert, Button } from '@wso2/oxygen-ui';
+import { useAnalyze } from '@/hooks/useAnalyze';
+import { useJobStatus } from '@/hooks/useJobStatus';
+import { Sparkles, Lock, Microscope } from 'lucide-react';
+import { Typography, Button } from '@wso2/oxygen-ui';
 
 export default function Home() {
   const currentStep = useAppStore((state) => state.currentStep);
   const quickSummary = useAppStore((state) => state.quickSummary);
-  const setStep = useAppStore((state) => state.setStep);
+  const deepAnalysisResult = useAppStore((state) => state.deepAnalysisResult);
+
+  const { mutate: triggerAnalyze, isPending: isStartingAnalyze, error: analyzeError } = useAnalyze();
+  const { data: jobStatusData, isLoading: isJobStatusLoading, error: jobStatusError } = useJobStatus();
 
   const handleStartDeepAnalysis = () => {
-    // Advanced to Phase 3 step when triggered
-    setStep('analyzing');
+    triggerAnalyze(undefined);
   };
 
   return (
@@ -40,18 +45,29 @@ export default function Home() {
       <section className="space-y-6">
         <RepoUrlInput />
 
-        {/* Step 2: Quick Summary Card (Revealed after submission) */}
+        {/* Step 2: Quick Summary Card (Revealed after URL submission) */}
         {quickSummary && (
           <QuickSummaryCard
             data={quickSummary}
             onStartDeepAnalysis={handleStartDeepAnalysis}
+            isStartingAnalysis={isStartingAnalyze}
           />
         )}
 
-        {/* Locked Placeholder Banner for Deep Analysis (Shown before trigger) */}
-        {quickSummary && currentStep === 'quick_summary' && (
+        {/* Step 3: Analysis Progress Stepper (Revealed during live polling) */}
+        {(currentStep === 'analyzing' || isStartingAnalyze) && (
+          <AnalysisProgressStepper
+            statusData={jobStatusData}
+            isLoading={isStartingAnalyze || isJobStatusLoading}
+            error={analyzeError || jobStatusError}
+            onRetry={handleStartDeepAnalysis}
+          />
+        )}
+
+        {/* Locked Placeholder Banner for Results & Chat (Shown before analysis) */}
+        {quickSummary && currentStep === 'quick_summary' && !deepAnalysisResult && (
           <SectionCard
-            title="Deep Analysis & Architecture Graph"
+            title="Deep Analysis Results & Architecture Graph"
             subtitle="Full vector embedding, module mapping, data flow analysis, and interactive chat."
             icon={<Lock className="h-5 w-5 text-amber-400" />}
             badge={<TagChip label="Locked" category="devops" />}
@@ -64,9 +80,11 @@ export default function Home() {
               <Button
                 variant="contained"
                 onClick={handleStartDeepAnalysis}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-xl"
+                disabled={isStartingAnalyze}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-xl flex items-center gap-2"
               >
-                Start Deep Analysis
+                <Microscope className="h-4 w-4" />
+                <span>Start Deep Analysis</span>
               </Button>
             </div>
           </SectionCard>
