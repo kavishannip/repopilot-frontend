@@ -6,6 +6,7 @@ import RepoUrlInput from '@/components/input/RepoUrlInput';
 import QuickSummaryCard from '@/components/quick-summary/QuickSummaryCard';
 import AnalysisProgressStepper from '@/components/progress/AnalysisProgressStepper';
 import ResultsRenderer from '@/components/deep-results/ResultsRenderer';
+import ArchitectureGraph from '@/components/graph/ArchitectureGraph';
 import SectionCard from '@/components/shared/SectionCard';
 import TagChip from '@/components/shared/TagChip';
 import { useAppStore } from '@/stores/appStore';
@@ -97,7 +98,10 @@ export default function Home() {
 
         {/* Step 4: Deep Analysis Results Dashboard */}
         {deepAnalysisResult && (
-          <ResultsRenderer brief={deepAnalysisResult} repoUrl={repoUrl} />
+          <>
+            <ResultsRenderer brief={deepAnalysisResult} repoUrl={repoUrl} />
+            <ArchitectureGraph />
+          </>
         )}
 
         {/* Locked Placeholder Banner */}
