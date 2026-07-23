@@ -95,7 +95,20 @@ export interface ComponentItem {
 export interface EntryPointItem {
   file_path: string;
   description?: string;
+  type?: string;
+  [key: string]: unknown;
 }
+
+// Flagged Issue Item
+export interface FlaggedIssueItem {
+  title?: string;
+  description?: string;
+  severity?: 'error' | 'warning' | 'info';
+  location?: string;
+  [key: string]: unknown;
+}
+
+export type LanguageBreakdown = Record<string, number>;
 
 // Deep Analysis Brief / Results Dashboard Payload
 export interface DeepAnalysisBrief {
@@ -109,8 +122,8 @@ export interface DeepAnalysisBrief {
   data_flow?: string;
   components?: ComponentItem[];
   entry_points?: EntryPointItem[];
-  flagged_issues?: string[];
-  language_breakdown?: Record<string, number>;
+  flagged_issues?: (string | FlaggedIssueItem)[];
+  language_breakdown?: LanguageBreakdown;
   directory_structure?: string;
   selected_files?: string[];
   [key: string]: unknown;
