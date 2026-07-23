@@ -27,7 +27,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       {mounted ? (
         <OxygenUIThemeProvider>{children}</OxygenUIThemeProvider>
       ) : (
-        <>{children}</>
+        <div suppressHydrationWarning className="min-h-screen bg-slate-950 text-slate-100">
+          {children}
+        </div>
       )}
     </QueryClientProvider>
   );
