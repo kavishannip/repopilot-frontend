@@ -20,7 +20,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <OxygenUIThemeProvider defaultMode="dark">
+      <OxygenUIThemeProvider>
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
