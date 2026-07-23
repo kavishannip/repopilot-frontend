@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className="antialiased">
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body suppressHydrationWarning className="bg-slate-950 text-slate-100 antialiased min-h-screen">
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <Providers>{children}</Providers>
         </AppRouterCacheProvider>
