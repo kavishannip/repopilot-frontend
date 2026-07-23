@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import React, { useState, useEffect } from 'react';
 import { OxygenUIThemeProvider } from '@wso2/oxygen-ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -18,13 +18,17 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       })
   );
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <OxygenUIThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </OxygenUIThemeProvider>
-    </AppRouterCacheProvider>
+    <QueryClientProvider client={queryClient}>
+      {mounted ? (
+        <OxygenUIThemeProvider>{children}</OxygenUIThemeProvider>
+      ) : (
+        <>{children}</>
+      )}
+    </QueryClientProvider>
   );
 }
