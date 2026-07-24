@@ -19,11 +19,13 @@ function GithubIcon({ className }: { className?: string }) {
 }
 
 export default function Navbar() {
+  const [isClient, setIsClient] = React.useState(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const reset = useAppStore((state) => state.reset);
   const currentStep = useAppStore((state) => state.currentStep);
 
   useEffect(() => {
+    setIsClient(true);
     let isMounted = true;
     async function checkHealth() {
       try {
@@ -71,32 +73,34 @@ export default function Navbar() {
 
         {/* Action Controls & Indicators */}
         <div className="flex items-center gap-3">
-          {/* Backend Status Dot */}
-          <Tooltip
-            title={
-              backendOnline === true
-                ? 'Backend API Connected (localhost:5000)'
-                : backendOnline === false
-                ? 'Backend API Disconnected'
-                : 'Checking API Status...'
-            }
-          >
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
-              <Activity className="h-3.5 w-3.5 text-slate-400" />
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  backendOnline === true
-                    ? 'bg-emerald-400 animate-pulse'
-                    : backendOnline === false
-                    ? 'bg-rose-500'
-                    : 'bg-amber-400'
-                }`}
-              />
-              <span className="text-slate-400 text-[11px] hidden md:inline">
-                {backendOnline === true ? 'API Ready' : backendOnline === false ? 'API Offline' : 'Connecting'}
-              </span>
-            </div>
-          </Tooltip>
+          {/* Backend Status Dot — only render after client mount to prevent hydration mismatch */}
+          {isClient && (
+            <Tooltip
+              title={
+                backendOnline === true
+                  ? 'Backend API Connected (localhost:5000)'
+                  : backendOnline === false
+                  ? 'Backend API Disconnected'
+                  : 'Checking API Status...'
+              }
+            >
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
+                <Activity className="h-3.5 w-3.5 text-slate-400" />
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    backendOnline === true
+                      ? 'bg-emerald-400 animate-pulse'
+                      : backendOnline === false
+                      ? 'bg-rose-500'
+                      : 'bg-amber-400'
+                  }`}
+                />
+                <span className="text-slate-400 text-[11px] hidden md:inline">
+                  {backendOnline === true ? 'API Ready' : backendOnline === false ? 'API Offline' : 'Connecting'}
+                </span>
+              </div>
+            </Tooltip>
+          )}
 
           {/* Reset App State */}
           {currentStep !== 'input' && (

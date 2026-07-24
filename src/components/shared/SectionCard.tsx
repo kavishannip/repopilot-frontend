@@ -86,7 +86,7 @@ export default function SectionCard({
           <div className="pt-5 border-t border-slate-800/80 mt-4">{children}</div>
         </Collapse>
       ) : (
-        <div className="pt-4">{children}</div>
+        <div className="pt-4 border-t border-slate-800/60 mt-4">{children}</div>
       )}
     </Paper>
   );

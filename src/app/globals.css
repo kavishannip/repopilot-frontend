@@ -13,4 +13,22 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Prevent layout shift from MUI theme injection */
+* {
+  box-sizing: border-box;
+}
+
+/* Stabilize MUI Typography rendering before theme injection */
+.MuiTypography-root {
+  line-height: inherit;
+}
+
+/* Prevent ReactFlow default styles from bleeding */
+.react-flow__attribution {
+  display: none;
 }
