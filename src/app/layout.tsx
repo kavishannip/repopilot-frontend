@@ -16,6 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <body suppressHydrationWarning className="bg-slate-950 text-slate-100 antialiased min-h-screen">
+        {/* AppRouterCacheProvider handles emotion component styles (not global styles).
+            Global styles from OxygenUIThemeProvider/CssBaseline are excluded from SSR
+            via the ssr:false dynamic import in Providers.tsx. */}
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <Providers>{children}</Providers>
         </AppRouterCacheProvider>
