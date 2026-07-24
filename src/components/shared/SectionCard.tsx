@@ -41,9 +41,18 @@ export default function SectionCard({
       <div
         className={cn(
           'flex items-center justify-between gap-3',
-          collapsible && 'cursor-pointer select-none'
+          collapsible && 'cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1'
         )}
         onClick={() => collapsible && setExpanded(!expanded)}
+        onKeyDown={(e) => {
+          if (collapsible && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
+        role={collapsible ? 'button' : undefined}
+        tabIndex={collapsible ? 0 : undefined}
+        aria-expanded={collapsible ? expanded : undefined}
       >
         <div className="flex items-center gap-3 min-w-0">
           {icon && (
