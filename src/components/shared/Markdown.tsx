@@ -19,12 +19,27 @@ export default function Markdown({ content, className }: MarkdownProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          pre({ children }) {
+            return <div className="my-4">{children}</div>;
+          },
           code({ className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || '');
             const codeString = String(children).replace(/\n$/, '');
+            const langMatch = /language-([a-zA-Z0-9_+-]+)(?::([^\s]+))?/.exec(className || '');
 
-            if (match) {
-              return <CodeBlock code={codeString} language={match[1]} className="my-3" />;
+            if (langMatch) {
+              let language = langMatch[1];
+              let filePath = langMatch[2] || '';
+              let cleanCode = codeString;
+
+              const headerMatch = /^(?:\/\/|#|\/\*|--)\s*File:\s*([^\r\n*]+)(?:\*\/)?\r?\n/i.exec(codeString);
+              if (headerMatch) {
+                if (!filePath) {
+                  filePath = headerMatch[1].trim();
+                }
+                cleanCode = codeString.replace(/^(?:\/\/|#|\/\*|--)\s*File:\s*[^\r\n*]+(?:\*\/)?\r?\n/i, '');
+              }
+
+              return <CodeBlock code={cleanCode} language={language} filePath={filePath} />;
             }
 
             return (
