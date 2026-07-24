@@ -7,6 +7,8 @@ import QuickSummaryCard from '@/components/quick-summary/QuickSummaryCard';
 import AnalysisProgressStepper from '@/components/progress/AnalysisProgressStepper';
 import ResultsRenderer from '@/components/deep-results/ResultsRenderer';
 import ArchitectureGraph from '@/components/graph/ArchitectureGraph';
+import ChatPanel from '@/components/chat/ChatPanel';
+import ChatLockCard from '@/components/chat/ChatLockCard';
 import SectionCard from '@/components/shared/SectionCard';
 import TagChip from '@/components/shared/TagChip';
 import { useAppStore } from '@/stores/appStore';
@@ -96,38 +98,21 @@ export default function Home() {
           />
         )}
 
-        {/* Step 4: Deep Analysis Results Dashboard */}
+        {/* Step 4: Deep Analysis Results & Architecture Graph */}
         {deepAnalysisResult && (
           <>
             <ResultsRenderer brief={deepAnalysisResult} repoUrl={repoUrl} />
             <ArchitectureGraph />
+            <ChatPanel />
           </>
         )}
 
-        {/* Locked Placeholder Banner */}
+        {/* Locked Chat & Results Placeholder Banner */}
         {quickSummary && currentStep === 'quick_summary' && !deepAnalysisResult && (
-          <SectionCard
-            title="Deep Analysis Results & Architecture Graph"
-            subtitle="Full vector embedding, module mapping, data flow analysis, and interactive chat."
-            icon={<Lock className="h-5 w-5 text-amber-400" />}
-            badge={<TagChip label="Locked" category="devops" />}
-            className="border-dashed border-slate-800/80 bg-slate-900/40"
-          >
-            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
-              <Typography variant="body2" className="text-slate-400 text-sm max-w-md">
-                Click <strong>&quot;Start Deep Analysis&quot;</strong> on the summary card above to begin vectorizing files and unlocking deep architecture insights.
-              </Typography>
-              <Button
-                variant="contained"
-                onClick={handleStartDeepAnalysis}
-                disabled={isStartingAnalyze}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-xl flex items-center gap-2"
-              >
-                <Microscope className="h-4 w-4" />
-                <span>Start Deep Analysis</span>
-              </Button>
-            </div>
-          </SectionCard>
+          <ChatLockCard
+            onStartDeepAnalysis={handleStartDeepAnalysis}
+            isStartingAnalysis={isStartingAnalyze}
+          />
         )}
       </section>
     </AppShell>
