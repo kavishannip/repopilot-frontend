@@ -2,7 +2,7 @@ import { JobPhase } from './types';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-export const STATUS_POLL_INTERVAL_MS = 3000;
+export const STATUS_POLL_INTERVAL_MS = 5000;
 
 export const PHASE_STEPS: Array<{ phase: JobPhase; label: string; description: string }> = [
   { phase: 'queued', label: 'Queued', description: 'Waiting to start analysis pipeline...' },
