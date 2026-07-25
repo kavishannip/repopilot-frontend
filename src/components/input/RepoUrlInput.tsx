@@ -151,7 +151,7 @@ export default function RepoUrlInput() {
               </>
             ) : (
               <>
-                <span>Quick Summary</span>
+                <span>Analyze</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}

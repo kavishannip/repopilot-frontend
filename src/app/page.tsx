@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import AppShell from '@/components/layout/AppShell';
 import RepoUrlInput from '@/components/input/RepoUrlInput';
 import QuickSummaryCard from '@/components/quick-summary/QuickSummaryCard';
@@ -9,21 +9,17 @@ import ResultsRenderer from '@/components/deep-results/ResultsRenderer';
 import ArchitectureGraph from '@/components/graph/ArchitectureGraph';
 import ChatPanel from '@/components/chat/ChatPanel';
 import ChatLockCard from '@/components/chat/ChatLockCard';
-import SectionCard from '@/components/shared/SectionCard';
-import TagChip from '@/components/shared/TagChip';
 import { useAppStore } from '@/stores/appStore';
 import { useAnalyze } from '@/hooks/useAnalyze';
 import { useJobStatus } from '@/hooks/useJobStatus';
-import { Sparkles, Lock, Microscope, ChevronDown, ChevronUp } from 'lucide-react';
-import { Typography, Button, Collapse, IconButton } from '@wso2/oxygen-ui';
+import { Sparkles } from 'lucide-react';
+import { Typography } from '@wso2/oxygen-ui';
 
 export default function Home() {
   const currentStep = useAppStore((state) => state.currentStep);
   const repoUrl = useAppStore((state) => state.repoUrl);
   const quickSummary = useAppStore((state) => state.quickSummary);
   const deepAnalysisResult = useAppStore((state) => state.deepAnalysisResult);
-
-  const [summaryExpanded, setSummaryExpanded] = useState(true);
 
   const { mutate: triggerAnalyze, isPending: isStartingAnalyze, error: analyzeError } = useAnalyze();
   const { data: jobStatusData, isLoading: isJobStatusLoading, error: jobStatusError } = useJobStatus();
@@ -53,39 +49,13 @@ export default function Home() {
         {/* Step 1: Repo URL Input */}
         <RepoUrlInput />
 
-        {/* Step 2: Quick Summary Card */}
-        {quickSummary && (
-          <div>
-            {deepAnalysisResult ? (
-              // Collapsible Accordion wrapper once deep results are active
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-                <div
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-900/90 transition-colors select-none"
-                  onClick={() => setSummaryExpanded(!summaryExpanded)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-indigo-400" />
-                    <span className="font-semibold text-slate-200 text-sm">Quick Overview Summary</span>
-                    <TagChip label="Collapsible" category="frontend" />
-                  </div>
-                  <IconButton size="small" className="text-slate-400">
-                    {summaryExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </IconButton>
-                </div>
-                <Collapse in={summaryExpanded}>
-                  <div className="p-4 pt-0">
-                    <QuickSummaryCard data={quickSummary} />
-                  </div>
-                </Collapse>
-              </div>
-            ) : (
-              <QuickSummaryCard
-                data={quickSummary}
-                onStartDeepAnalysis={handleStartDeepAnalysis}
-                isStartingAnalysis={isStartingAnalyze}
-              />
-            )}
-          </div>
+        {/* Step 2: Quick Summary Card (Only shown if quick summary exists and deep analysis is not yet completed) */}
+        {quickSummary && !deepAnalysisResult && (
+          <QuickSummaryCard
+            data={quickSummary}
+            onStartDeepAnalysis={handleStartDeepAnalysis}
+            isStartingAnalysis={isStartingAnalyze}
+          />
         )}
 
         {/* Step 3: Analysis Progress Stepper */}

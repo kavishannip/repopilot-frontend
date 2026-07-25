@@ -3,21 +3,19 @@
 import React from 'react';
 import SectionCard from '../shared/SectionCard';
 import TagChip from '../shared/TagChip';
-import { Layers, Cpu } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { TechStackItem } from '@/lib/types';
 import { hasData, isEmpty } from '@/lib/isEmpty';
 import { Typography, Chip } from '@wso2/oxygen-ui';
 
 interface TechStackSectionProps {
   techStack: TechStackItem[];
-  frameworkDetails?: Record<string, unknown>;
 }
 
 export default function TechStackSection({
   techStack,
-  frameworkDetails,
 }: TechStackSectionProps) {
-  if (isEmpty(techStack) && isEmpty(frameworkDetails)) return null;
+  if (isEmpty(techStack)) return null;
 
   // Dynamically group tech stack by category
   const groupedTech: Record<string, TechStackItem[]> = {};
@@ -74,34 +72,6 @@ export default function TechStackSection({
             </div>
           </div>
         ))}
-
-        {/* Framework Details Table if present */}
-        {hasData(frameworkDetails) && (
-          <div className="pt-4 border-t border-slate-800/80 space-y-3">
-            <div className="flex items-center gap-2">
-              <Cpu className="h-4 w-4 text-indigo-400" />
-              <Typography variant="subtitle2" className="font-semibold text-slate-300 text-sm">
-                Framework Details
-              </Typography>
-            </div>
-            <div className="overflow-x-auto rounded-xl border border-slate-800">
-              <table className="min-w-full divide-y divide-slate-800 text-left text-xs">
-                <tbody className="divide-y divide-slate-800/60">
-                  {Object.entries(frameworkDetails!).map(([key, val]) => (
-                    <tr key={key}>
-                      <td className="px-4 py-2 bg-slate-900/60 font-mono font-medium text-slate-300 w-1/3">
-                        {key}
-                      </td>
-                      <td className="px-4 py-2 text-slate-300 font-mono">
-                        {typeof val === 'object' ? JSON.stringify(val) : String(val)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
       </div>
     </SectionCard>
   );

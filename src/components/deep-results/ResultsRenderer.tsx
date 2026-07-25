@@ -81,10 +81,7 @@ export default function ResultsRenderer({ brief, repoUrl }: ResultsRendererProps
 
       {/* 2. Tech Stack */}
       {hasData(brief.tech_stack) && (
-        <TechStackSection
-          techStack={brief.tech_stack!}
-          frameworkDetails={brief.framework_details}
-        />
+        <TechStackSection techStack={brief.tech_stack!} />
       )}
 
       {/* 3. Architectural Components */}

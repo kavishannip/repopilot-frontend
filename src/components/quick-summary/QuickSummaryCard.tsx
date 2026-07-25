@@ -31,11 +31,18 @@ export default function QuickSummaryCard({
       className="border border-slate-800 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl shadow-indigo-950/30 animate-in fade-in slide-in-from-bottom-4 duration-500"
     >
       {/* Accuracy Disclaimer Banner */}
-      <div className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs md:text-sm">
-        <Zap className="h-4 w-4 shrink-0 text-amber-400" />
-        <div className="flex-1 min-w-0">
-          <span className="font-semibold">Quick Summary</span> — Based on README and package manifests only. Results may be incomplete compared to Deep Analysis.
+      <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs md:text-sm flex-wrap">
+        <div className="flex items-center gap-2">
+          <Zap className="h-4 w-4 shrink-0 text-amber-400" />
+          <div className="flex-1 min-w-0">
+            <span className="font-semibold">Quick Summary</span> — Based on README and package manifests only. Results may be incomplete compared to Deep Analysis.
+          </div>
         </div>
+        {data.cached && (
+          <div className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shrink-0">
+            ⚡ Loaded from Cache
+          </div>
+        )}
       </div>
 
       {/* Repo Header */}

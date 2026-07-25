@@ -18,10 +18,7 @@ export function useAnalyze() {
       return api.startDeepAnalysis(targetId);
     },
     onSuccess: (data) => {
-      if (data.status === 'completed' && data.message) {
-        // Cache hit or instant completion
-        setStep('results');
-      } else if (data.job_id) {
+      if (data.job_id) {
         setJobId(data.job_id);
         setStep('analyzing');
       }

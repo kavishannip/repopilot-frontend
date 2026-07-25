@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './constants';
+import { getClientId } from './clientId';
 import {
   QuickSummaryResponse,
   AnalyzeJobResponse,
@@ -18,12 +19,13 @@ class ApiError extends Error {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const { headers: extraHeaders, ...restOptions } = options;
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(extraHeaders as Record<string, string> | undefined),
     },
-    ...options,
+    ...restOptions,
   });
 
   if (!response.ok) {
@@ -69,22 +71,27 @@ export const api = {
     request<CreateChatSessionResponse>('/api/chat/session', {
       method: 'POST',
       body: JSON.stringify({ repo_id: repoId, client_id: clientId, title: 'Repo Chat' }),
+      headers: { 'X-Client-ID': clientId },
     }),
 
-  // Chat - Send Message
+  // Chat - Send Message (clientId auto-resolved from localStorage)
   sendChatMessage: (sessionId: string, message: string) =>
     request<SendChatMessageResponse>('/api/chat/message', {
       method: 'POST',
-      body: JSON.stringify({ session_id: sessionId, message }),
+      body: JSON.stringify({ session_id: sessionId, question: message, message }),
+      headers: { 'X-Client-ID': getClientId() },
     }),
 
-  // Chat - Get History
+  // Chat - Get History (clientId auto-resolved from localStorage)
   getChatHistory: (sessionId: string) =>
-    request<{ messages: ChatMessage[] }>(`/api/chat/session/${sessionId}`),
+    request<{ messages: ChatMessage[] }>(`/api/chat/session/${sessionId}`, {
+      headers: { 'X-Client-ID': getClientId() },
+    }),
 
   // Chat - Delete Session
   deleteChatSession: (sessionId: string) =>
     request<{ success: boolean }>(`/api/chat/session/${sessionId}`, {
       method: 'DELETE',
+      headers: { 'X-Client-ID': getClientId() },
     }),
 };

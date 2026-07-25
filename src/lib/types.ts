@@ -52,6 +52,7 @@ export interface QuickSummaryResponse {
   metadata: RepoMetadata;
   summary: string;
   cached?: boolean;
+  cached_brief?: DeepAnalysisBrief;
 }
 
 // Analyze Trigger Response
@@ -142,15 +143,19 @@ export interface GraphNodeData {
 
 export interface GraphNode {
   id: string;
+  path?: string;
   type?: 'folderNode' | 'fileNode' | string;
-  data: GraphNodeData;
+  deep_analysis?: boolean;
+  data?: GraphNodeData;
   position?: { x: number; y: number };
 }
 
 export interface GraphEdge {
   id: string;
-  source: string;
-  target: string;
+  source?: string;
+  target?: string;
+  source_node_id?: string;
+  target_node_id?: string;
   label?: string;
   type?: 'contains' | 'imports' | string;
 }

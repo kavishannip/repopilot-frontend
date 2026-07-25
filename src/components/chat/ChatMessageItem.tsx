@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Markdown from '../shared/Markdown';
 import { ChatMessage } from '@/lib/types';
 import { Chip, IconButton, Tooltip } from '@wso2/oxygen-ui';
-import { User, Compass, Copy, Check, FileText, Search, Sparkles } from 'lucide-react';
+import { User, Compass, Copy, Check, FileText, Search, Sparkles, Code } from 'lucide-react';
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -19,6 +19,8 @@ export default function ChatMessageItem({ message }: ChatMessageItemProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const hasCodeSnippet = !isUser && /```/.test(message.content);
 
   if (isUser) {
     return (
@@ -46,7 +48,7 @@ export default function ChatMessageItem({ message }: ChatMessageItemProps) {
 
           {/* Copy Button */}
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Tooltip title={copied ? 'Copied!' : 'Copy response'}>
+            <Tooltip title={copied ? 'Copied!' : 'Copy full response'}>
               <IconButton
                 size="small"
                 onClick={handleCopy}
@@ -61,7 +63,8 @@ export default function ChatMessageItem({ message }: ChatMessageItemProps) {
         {/* Assistant Response Metadata Badge Row */}
         {(typeof message.sufficient === 'boolean' ||
           typeof message.retrieved_chunks_count === 'number' ||
-          message.fallback_triggered) && (
+          message.fallback_triggered ||
+          hasCodeSnippet) && (
           <div className="flex items-center gap-2 flex-wrap text-[11px] text-slate-400 px-1">
             {message.sufficient === true && (
               <Chip
@@ -77,6 +80,15 @@ export default function ChatMessageItem({ message }: ChatMessageItemProps) {
                 label="Partial Context"
                 size="small"
                 className="bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] h-5 font-medium"
+              />
+            )}
+
+            {hasCodeSnippet && (
+              <Chip
+                icon={<Code className="h-3 w-3 text-indigo-400" />}
+                label="Verbatim Code Included"
+                size="small"
+                className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px] h-5 font-medium"
               />
             )}
 

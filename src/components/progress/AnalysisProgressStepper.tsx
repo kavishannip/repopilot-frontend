@@ -4,16 +4,10 @@ import React from 'react';
 import {
   Paper,
   Typography,
-  Stepper,
-  Step,
-  StepLabel,
   Button,
   Alert,
-  CircularProgress,
-  Box,
 } from '@wso2/oxygen-ui';
-import { Check, Loader2, AlertCircle, Microscope, RefreshCw } from 'lucide-react';
-import { PHASE_STEPS } from '@/lib/constants';
+import { Loader2, Microscope, RefreshCw } from 'lucide-react';
 import { JobPhase, JobStatusResponse } from '@/lib/types';
 
 interface AnalysisProgressStepperProps {
@@ -32,10 +26,6 @@ export default function AnalysisProgressStepper({
   const currentPhase: JobPhase = statusData?.status || 'queued';
   const isFailed = currentPhase === 'failed' || Boolean(error) || Boolean(statusData?.error);
   const errorMessage = statusData?.error || error?.message || 'An unexpected error occurred during deep analysis.';
-
-  // Determine active phase index in stepper
-  const activeStepIndex = PHASE_STEPS.findIndex((step) => step.phase === currentPhase);
-  const normalizedActiveStep = activeStepIndex === -1 ? (currentPhase === 'completed' ? PHASE_STEPS.length : 0) : activeStepIndex;
 
   return (
     <Paper
@@ -88,61 +78,32 @@ export default function AnalysisProgressStepper({
         </Alert>
       )}
 
-      {/* Stepper Pipeline List */}
-      <div className="py-2">
-        <Stepper activeStep={normalizedActiveStep} orientation="vertical" className="space-y-4">
-          {PHASE_STEPS.map((stepItem, index) => {
-            const isCompleted = index < normalizedActiveStep || currentPhase === 'completed';
-            const isActive = index === normalizedActiveStep && !isFailed && currentPhase !== 'completed';
+      {/* Animated Progress Loader Section */}
+      {!isFailed && (
+        <div className="py-8 flex flex-col items-center justify-center space-y-6 text-center">
+          <div className="relative flex items-center justify-center">
+            {/* Outer Glowing Ring Animation */}
+            <div className="absolute h-24 w-24 rounded-full bg-gradient-to-tr from-indigo-500 via-cyan-400 to-emerald-400 animate-spin blur-md opacity-60" />
+            <div className="relative h-20 w-20 rounded-full bg-slate-950 border border-indigo-500/40 flex items-center justify-center shadow-xl">
+              <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
+            </div>
+          </div>
 
-            return (
-              <Step key={stepItem.phase} active={isActive} completed={isCompleted}>
-                <StepLabel
-                  StepIconComponent={() => (
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
-                        isCompleted
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                          : isActive
-                          ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/40 ring-4 ring-indigo-500/20 scale-110'
-                          : 'bg-slate-800 text-slate-500 border border-slate-700/60'
-                      }`}
-                    >
-                      {isCompleted ? (
-                        <Check className="h-4 w-4 text-emerald-400" />
-                      ) : isActive ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-white" />
-                      ) : (
-                        <span>{index + 1}</span>
-                      )}
-                    </div>
-                  )}
-                >
-                  <div className="ml-2">
-                    <Typography
-                      variant="subtitle2"
-                      className={`font-semibold text-sm transition-colors ${
-                        isActive
-                          ? 'text-indigo-300 font-bold'
-                          : isCompleted
-                          ? 'text-slate-200'
-                          : 'text-slate-500'
-                      }`}
-                    >
-                      {stepItem.label}
-                    </Typography>
-                    <Typography variant="caption" className="text-slate-400 text-xs block mt-0.5">
-                      {isActive && statusData?.current_phase_label
-                        ? statusData.current_phase_label
-                        : stepItem.description}
-                    </Typography>
-                  </div>
-                </StepLabel>
-              </Step>
-            );
-          })}
-        </Stepper>
-      </div>
+          <div className="space-y-2 max-w-md">
+            <Typography variant="h6" className="font-bold text-slate-100 text-base md:text-lg">
+              {statusData?.current_phase_label || 'Analyzing Repository Architecture...'}
+            </Typography>
+            <Typography variant="body2" className="text-slate-400 text-xs md:text-sm">
+              Please wait while the LLM reasoning pipeline extracts structural dependencies, dependency graphs, and technical summaries.
+            </Typography>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono">
+            <span className="h-2 w-2 rounded-full bg-indigo-400 animate-ping" />
+            <span>Processing repository... results will appear automatically</span>
+          </div>
+        </div>
+      )}
     </Paper>
   );
 }

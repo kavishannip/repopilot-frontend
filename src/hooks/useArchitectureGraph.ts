@@ -47,11 +47,15 @@ async function layoutGraph(graphData: ArchitectureGraphResponse): Promise<{ node
       width: 220,
       height: 60,
     })),
-    edges: rawEdges.map((edge, idx) => ({
-      id: `e-${idx}-${edge.source}-${edge.target}`,
-      sources: [edge.source],
-      targets: [edge.target],
-    })),
+    edges: rawEdges.map((edge, idx) => {
+      const src = edge.source || edge.source_node_id || '';
+      const tgt = edge.target || edge.target_node_id || '';
+      return {
+        id: edge.id || `e-${idx}-${src}-${tgt}`,
+        sources: [src],
+        targets: [tgt],
+      };
+    }),
   };
 
   let layoutResult;
@@ -69,8 +73,12 @@ async function layoutGraph(graphData: ArchitectureGraphResponse): Promise<{ node
 
   const formattedNodes: Node[] = rawNodes.map((node) => {
     const pos = nodePositionMap.get(node.id) || { x: 0, y: 0 };
-    const nodeData = node.data || {};
-    const isFolder = nodeData.type === 'folder' || node.id.includes('/') && !node.id.includes('.');
+    const nodeData = (node.data || {}) as Record<string, unknown>;
+    const nodePath = (nodeData.path || node.path || node.id) as string;
+    const isFolder =
+      nodeData.type === 'folder' ||
+      node.type === 'folder' ||
+      (nodePath.includes('/') && !nodePath.includes('.'));
 
     return {
       id: node.id,
@@ -78,20 +86,22 @@ async function layoutGraph(graphData: ArchitectureGraphResponse): Promise<{ node
       position: pos,
       data: {
         ...nodeData,
-        label: (nodeData.label as string) || node.id,
-        path: (nodeData.path as string) || node.id,
+        label: (nodeData.label as string) || nodePath,
+        path: nodePath,
         type: isFolder ? 'folder' : 'file',
-        deep_analysis: Boolean(nodeData.deep_analysis),
+        deep_analysis: Boolean(nodeData.deep_analysis || node.deep_analysis),
       },
     };
   });
 
   const formattedEdges: Edge[] = rawEdges.map((edge, idx) => {
+    const src = edge.source || edge.source_node_id || '';
+    const tgt = edge.target || edge.target_node_id || '';
     const isImport = edge.type === 'imports' || edge.label === 'imports';
     return {
-      id: `e-${idx}-${edge.source}-${edge.target}`,
-      source: edge.source,
-      target: edge.target,
+      id: edge.id || `e-${idx}-${src}-${tgt}`,
+      source: src,
+      target: tgt,
       type: isImport ? 'smoothstep' : 'default',
       animated: isImport,
       style: {
@@ -99,7 +109,7 @@ async function layoutGraph(graphData: ArchitectureGraphResponse): Promise<{ node
         strokeWidth: isImport ? 2 : 1.5,
         strokeDasharray: isImport ? undefined : '5,5',
       },
-      label: edge.label,
+      label: edge.label || edge.type,
     };
   });
 

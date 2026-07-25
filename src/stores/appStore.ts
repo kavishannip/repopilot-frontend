@@ -19,7 +19,7 @@ interface AppState {
   setJobId: (id: string | null) => void;
 
   deepAnalysisResult: DeepAnalysisBrief | null;
-  setDeepAnalysisResult: (result: DeepAnalysisBrief) => void;
+  setDeepAnalysisResult: (result: DeepAnalysisBrief | null) => void;
 
   // Chat Session
   sessionId: string | null;

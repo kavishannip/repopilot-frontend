@@ -26,21 +26,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsClient(true);
-    let isMounted = true;
-    async function checkHealth() {
-      try {
-        const res = await fetch(`${API_BASE_URL}/health`, { method: 'GET' }).catch(() => null);
-        if (isMounted) setBackendOnline(res ? res.ok || res.status < 500 : false);
-      } catch {
-        if (isMounted) setBackendOnline(false);
-      }
-    }
-    checkHealth();
-    const interval = setInterval(checkHealth, 30000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
+    setBackendOnline(true);
   }, []);
 
   return (
