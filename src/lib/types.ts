@@ -53,6 +53,19 @@ export interface QuickSummaryResponse {
   summary: string;
   cached?: boolean;
   cached_brief?: DeepAnalysisBrief;
+  commit_sha?: string;
+}
+
+export interface CheckUpdateResponse {
+  is_stale: boolean;
+  cached_sha?: string | null;
+  latest_sha?: string | null;
+  changed_files_count: number;
+  diff_summary?: {
+    added: number;
+    modified: number;
+    removed: number;
+  };
 }
 
 // Analyze Trigger Response
