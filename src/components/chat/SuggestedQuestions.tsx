@@ -6,9 +6,10 @@ import { useAppStore } from '@/stores/appStore';
 
 interface SuggestedQuestionsProps {
   onSelectQuestion: (question: string) => void;
+  disabled?: boolean;
 }
 
-export default function SuggestedQuestions({ onSelectQuestion }: SuggestedQuestionsProps) {
+export default function SuggestedQuestions({ onSelectQuestion, disabled }: SuggestedQuestionsProps) {
   const deepAnalysisResult = useAppStore((state) => state.deepAnalysisResult);
 
   const patterns = (deepAnalysisResult?.detected_patterns || []).map((p) => p.toLowerCase());
@@ -53,8 +54,13 @@ export default function SuggestedQuestions({ onSelectQuestion }: SuggestedQuesti
           <button
             key={q}
             type="button"
-            onClick={() => onSelectQuestion(q)}
-            className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-left text-xs text-slate-300 hover:text-indigo-300 font-medium transition-all group"
+            disabled={disabled}
+            onClick={() => !disabled && onSelectQuestion(q)}
+            className={`flex items-center gap-2 p-3 rounded-xl text-left text-xs font-medium transition-all group ${
+              disabled
+                ? 'bg-slate-900/40 border border-slate-800/50 text-slate-600 cursor-not-allowed opacity-60'
+                : 'bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-indigo-300'
+            }`}
           >
             <MessageSquare className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-400 shrink-0" />
             <span className="line-clamp-2">{q}</span>
