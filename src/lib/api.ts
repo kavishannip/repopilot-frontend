@@ -58,6 +58,20 @@ export const api = {
       body: JSON.stringify({ repo_id: repoId }),
     }),
 
+  // Check Repository Update / Staleness
+  checkUpdate: (repoUrl: string) =>
+    request<import('./types').CheckUpdateResponse>('/api/analyzer/check-update', {
+      method: 'POST',
+      body: JSON.stringify({ repo_url: repoUrl }),
+    }),
+
+  // Submit Sync async job
+  syncRepo: (repoId: string) =>
+    request<AnalyzeJobResponse>('/api/analyzer/sync', {
+      method: 'POST',
+      body: JSON.stringify({ repo_id: repoId }),
+    }),
+
   // Get async job status (polled)
   getJobStatus: (jobId: string) =>
     request<JobStatusResponse>(`/api/analyzer/status/${jobId}`),

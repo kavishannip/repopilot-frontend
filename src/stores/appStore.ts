@@ -21,6 +21,11 @@ interface AppState {
   deepAnalysisResult: DeepAnalysisBrief | null;
   setDeepAnalysisResult: (result: DeepAnalysisBrief | null) => void;
 
+  // Staleness / Update State
+  isRepoStale: boolean;
+  staleDiffSummary: { added: number; modified: number; removed: number } | null;
+  setStaleInfo: (stale: boolean, diffSummary?: { added: number; modified: number; removed: number } | null) => void;
+
   // Chat Session
   sessionId: string | null;
   setSessionId: (id: string | null) => void;
@@ -47,6 +52,10 @@ export const useAppStore = create<AppState>((set) => ({
   deepAnalysisResult: null,
   setDeepAnalysisResult: (deepAnalysisResult) => set({ deepAnalysisResult }),
 
+  isRepoStale: false,
+  staleDiffSummary: null,
+  setStaleInfo: (isRepoStale, staleDiffSummary = null) => set({ isRepoStale, staleDiffSummary }),
+
   sessionId: null,
   setSessionId: (sessionId) => set({ sessionId }),
 
@@ -58,6 +67,8 @@ export const useAppStore = create<AppState>((set) => ({
       quickSummary: null,
       jobId: null,
       deepAnalysisResult: null,
+      isRepoStale: false,
+      staleDiffSummary: null,
       sessionId: null,
     }),
 }));

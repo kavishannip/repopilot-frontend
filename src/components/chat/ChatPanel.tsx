@@ -7,12 +7,16 @@ import ChatMessageItem from './ChatMessageItem';
 import SuggestedQuestions from './SuggestedQuestions';
 import { useChatSession } from '@/hooks/useChatSession';
 import { useSendMessage } from '@/hooks/useSendMessage';
+import { useAppStore } from '@/stores/appStore';
 import { TextField, IconButton, CircularProgress, LinearProgress } from '@wso2/oxygen-ui';
 import { MessageSquare, Send, Sparkles, Loader2, Bot } from 'lucide-react';
 
 export default function ChatPanel() {
   const [inputText, setInputText] = useState('');
   const [extendedSearchNotice, setExtendedSearchNotice] = useState(false);
+
+  const currentStep = useAppStore((state) => state.currentStep);
+  const isAnalyzing = currentStep === 'analyzing';
 
   const {
     sessionId,
@@ -28,12 +32,12 @@ export default function ChatPanel() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-create chat session if unlocked and session ID not present
+  // Auto-create chat session if unlocked, not analyzing, and session ID not present
   useEffect(() => {
-    if (isChatUnlocked && !sessionId && !isCreatingSession) {
+    if (isChatUnlocked && !sessionId && !isCreatingSession && !isAnalyzing) {
       createSession();
     }
-  }, [isChatUnlocked, sessionId, isCreatingSession, createSession]);
+  }, [isChatUnlocked, sessionId, isCreatingSession, createSession, isAnalyzing]);
 
   // Handle 3s extended search indicator during long response latency
   useEffect(() => {
@@ -61,7 +65,7 @@ export default function ChatPanel() {
 
   const handleSend = () => {
     const trimmed = inputText.trim();
-    if (!trimmed || isSending || !sessionId) return;
+    if (!trimmed || isSending || !sessionId || isAnalyzing) return;
     setInputText('');
     sendMessage(trimmed);
   };
@@ -80,10 +84,23 @@ export default function ChatPanel() {
       title="Chat with Repository"
       subtitle="AI-powered structural QA and code reasoning."
       icon={<MessageSquare className="h-5 w-5 text-indigo-400" />}
-      badge={<TagChip label="Unlocked" category="frontend" />}
+      badge={
+        <TagChip
+          label={isAnalyzing ? 'Disabled (Analyzing)' : 'Unlocked'}
+          category={isAnalyzing ? 'backend' : 'frontend'}
+        />
+      }
       collapsible
     >
       <div className="space-y-4">
+        {/* Analysis in Progress Warning Banner */}
+        {isAnalyzing && (
+          <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-center gap-2.5 shadow-sm animate-in fade-in">
+            <Loader2 className="h-4 w-4 animate-spin text-amber-400 shrink-0" />
+            <span>Repository sync and deep analysis in progress. Chat is temporarily disabled.</span>
+          </div>
+        )}
+
         {/* Messages Container — 450px Scrollable */}
         <div
           ref={chatContainerRef}
@@ -105,7 +122,7 @@ export default function ChatPanel() {
                   Powered by vector search and structural dependency graph context.
                 </span>
               </div>
-              <SuggestedQuestions onSelectQuestion={(q) => sendMessage(q)} />
+              <SuggestedQuestions onSelectQuestion={(q) => sendMessage(q)} disabled={isAnalyzing} />
             </div>
           ) : (
             <>
@@ -148,11 +165,15 @@ export default function ChatPanel() {
               fullWidth
               multiline
               maxRows={4}
-              placeholder="Ask a question about this repository... (Enter to send, Shift+Enter for new line)"
+              placeholder={
+                isAnalyzing
+                  ? 'Chat disabled during repository sync/analysis...'
+                  : 'Ask a question about this repository... (Enter to send, Shift+Enter for new line)'
+              }
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isSending || !sessionId}
+              disabled={isSending || !sessionId || isAnalyzing}
               variant="outlined"
               size="small"
               sx={{
@@ -168,7 +189,7 @@ export default function ChatPanel() {
 
           <IconButton
             onClick={handleSend}
-            disabled={isSending || !inputText.trim() || !sessionId}
+            disabled={isSending || !inputText.trim() || !sessionId || isAnalyzing}
             className="h-10 w-10 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white disabled:text-slate-500 rounded-xl transition-all shrink-0"
           >
             {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}

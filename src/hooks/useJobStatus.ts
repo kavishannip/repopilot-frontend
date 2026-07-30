@@ -10,6 +10,7 @@ export function useJobStatus() {
   const currentStep = useAppStore((state) => state.currentStep);
   const setStep = useAppStore((state) => state.setStep);
   const setDeepAnalysisResult = useAppStore((state) => state.setDeepAnalysisResult);
+  const setStaleInfo = useAppStore((state) => state.setStaleInfo);
 
   const query = useQuery<JobStatusResponse, Error>({
     queryKey: ['jobStatus', jobId],
@@ -31,9 +32,10 @@ export function useJobStatus() {
   useEffect(() => {
     if (query.data?.status === 'completed' && query.data.result) {
       setDeepAnalysisResult(query.data.result);
+      setStaleInfo(false, null);
       setStep('results');
     }
-  }, [query.data, setDeepAnalysisResult, setStep]);
+  }, [query.data, setDeepAnalysisResult, setStaleInfo, setStep]);
 
   return query;
 }

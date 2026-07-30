@@ -15,6 +15,10 @@ export function useSendMessage() {
   >({
     mutationFn: async (messageText: string) => {
       if (!sessionId) throw new Error('No active chat session.');
+      const currentStep = useAppStore.getState().currentStep;
+      if (currentStep === 'analyzing') {
+        throw new Error('Chat is temporarily disabled while repository analysis/sync is in progress.');
+      }
       return api.sendChatMessage(sessionId, messageText);
     },
     onMutate: async (messageText: string) => {

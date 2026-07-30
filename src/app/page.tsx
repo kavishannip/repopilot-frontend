@@ -9,6 +9,7 @@ import ResultsRenderer from '@/components/deep-results/ResultsRenderer';
 import ArchitectureGraph from '@/components/graph/ArchitectureGraph';
 import ChatPanel from '@/components/chat/ChatPanel';
 import ChatLockCard from '@/components/chat/ChatLockCard';
+import StaleBanner from '@/components/shared/StaleBanner';
 import { useAppStore } from '@/stores/appStore';
 import { useAnalyze } from '@/hooks/useAnalyze';
 import { useJobStatus } from '@/hooks/useJobStatus';
@@ -48,6 +49,9 @@ export default function Home() {
       <section className="space-y-6">
         {/* Step 1: Repo URL Input */}
         <RepoUrlInput />
+
+        {/* Stale Cache Alert Banner */}
+        <StaleBanner />
 
         {/* Step 2: Quick Summary Card (Only shown if quick summary exists and deep analysis is not yet completed) */}
         {quickSummary && !deepAnalysisResult && (
