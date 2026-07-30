@@ -4,7 +4,7 @@ import {
   QuickSummaryResponse,
   AnalyzeJobResponse,
   JobStatusResponse,
-  ArchitectureGraphResponse,
+  ArchitectureDiagramResponse,
   CreateChatSessionResponse,
   SendChatMessageResponse,
   ChatMessage,
@@ -76,9 +76,12 @@ export const api = {
   getJobStatus: (jobId: string) =>
     request<JobStatusResponse>(`/api/analyzer/status/${jobId}`),
 
-  // Get Architecture Graph
-  getArchitectureGraph: (repoUrl: string) =>
-    request<ArchitectureGraphResponse>(`/api/analyzer/graph?repo_url=${encodeURIComponent(repoUrl)}`),
+  // Generate Architecture Diagram via LLM
+  generateArchitectureDiagram: (repoId: string, forceRegenerate: boolean = false) =>
+    request<ArchitectureDiagramResponse>('/api/analyzer/architecture-diagram', {
+      method: 'POST',
+      body: JSON.stringify({ repo_id: repoId, force_regenerate: forceRegenerate }),
+    }),
 
   // Chat - Create Session
   createChatSession: (repoId: string, clientId: string) =>

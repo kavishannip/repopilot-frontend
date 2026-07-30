@@ -140,42 +140,17 @@ export interface DeepAnalysisBrief {
   language_breakdown?: LanguageBreakdown;
   directory_structure?: string;
   selected_files?: string[];
+  architecture_diagram?: {
+    mermaid_code: string;
+    diagram_type: string;
+  };
   [key: string]: unknown;
 }
 
-// Architecture Graph Types
-export interface GraphNodeData {
-  label: string;
-  path: string;
-  type: 'folder' | 'file';
-  deep_analysis?: boolean;
-  size?: number;
-  language?: string;
-  [key: string]: unknown;
-}
-
-export interface GraphNode {
-  id: string;
-  path?: string;
-  type?: 'folderNode' | 'fileNode' | string;
-  deep_analysis?: boolean;
-  data?: GraphNodeData;
-  position?: { x: number; y: number };
-}
-
-export interface GraphEdge {
-  id: string;
-  source?: string;
-  target?: string;
-  source_node_id?: string;
-  target_node_id?: string;
-  label?: string;
-  type?: 'contains' | 'imports' | string;
-}
-
-export interface ArchitectureGraphResponse {
-  nodes: GraphNode[];
-  edges: GraphEdge[];
+export interface ArchitectureDiagramResponse {
+  mermaid_code: string;
+  diagram_type: string;
+  cached: boolean;
 }
 
 // Chat Types
