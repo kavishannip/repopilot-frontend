@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Chip, Tooltip, IconButton } from '@wso2/oxygen-ui';
 import { Compass, Activity, RefreshCw } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { API_BASE_URL } from '@/lib/constants';
 import { useAppStore } from '@/stores/appStore';
+
+const UserAuthButton = dynamic(() => import('@/components/auth/UserAuthButton'), { ssr: false });
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -111,6 +114,9 @@ export default function Navbar() {
           >
             <GithubIcon className="h-4 w-4" />
           </a>
+
+          {/* Asgardeo User Authentication Button */}
+          {isClient && <UserAuthButton />}
         </div>
       </div>
     </header>
