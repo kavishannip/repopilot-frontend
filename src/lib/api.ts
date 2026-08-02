@@ -24,7 +24,15 @@ async function getAccessToken(): Promise<string | null> {
     const auth = AsgardeoSPAClient.getInstance();
     const isAuthenticated = await auth.isAuthenticated();
     if (isAuthenticated) {
-      return await auth.getAccessToken();
+      // getIDToken() returns the OpenID Connect 3-segment RS256 JWT
+      const idToken = await auth.getIDToken();
+      if (idToken && idToken.split('.').length === 3) {
+        return idToken;
+      }
+      const accessToken = await auth.getAccessToken();
+      if (accessToken && accessToken.split('.').length === 3) {
+        return accessToken;
+      }
     }
   } catch {
     // Return null if auth is not initialized or user is not logged in
