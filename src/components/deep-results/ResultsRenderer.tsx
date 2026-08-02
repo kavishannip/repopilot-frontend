@@ -38,6 +38,8 @@ const HANDLED_FIELDS = new Set([
   'directory_structure',
   'selected_files',
   'graph',
+  'architecture_diagram',
+  'dependency_graph',
 ]);
 
 export default function ResultsRenderer({ brief, repoUrl }: ResultsRendererProps) {

@@ -1,10 +1,11 @@
 import { API_BASE_URL } from './constants';
 import { getClientId } from './clientId';
+import { AsgardeoSPAClient } from '@asgardeo/auth-react';
 import {
   QuickSummaryResponse,
   AnalyzeJobResponse,
   JobStatusResponse,
-  ArchitectureGraphResponse,
+  ArchitectureDiagramResponse,
   CreateChatSessionResponse,
   SendChatMessageResponse,
   ChatMessage,
@@ -17,12 +18,34 @@ class ApiError extends Error {
   }
 }
 
+async function getAccessToken(): Promise<string | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const auth = AsgardeoSPAClient.getInstance();
+    const isAuthenticated = await auth.isAuthenticated();
+    if (isAuthenticated) {
+      return await auth.getAccessToken();
+    }
+  } catch {
+    // Return null if auth is not initialized or user is not logged in
+  }
+  return null;
+}
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   const { headers: extraHeaders, ...restOptions } = options;
+
+  const accessToken = await getAccessToken();
+  const authHeaders: Record<string, string> = {};
+  if (accessToken) {
+    authHeaders['Authorization'] = `Bearer ${accessToken}`;
+  }
+
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
       ...(extraHeaders as Record<string, string> | undefined),
     },
     ...restOptions,
@@ -76,9 +99,12 @@ export const api = {
   getJobStatus: (jobId: string) =>
     request<JobStatusResponse>(`/api/analyzer/status/${jobId}`),
 
-  // Get Architecture Graph
-  getArchitectureGraph: (repoUrl: string) =>
-    request<ArchitectureGraphResponse>(`/api/analyzer/graph?repo_url=${encodeURIComponent(repoUrl)}`),
+  // Generate Architecture Diagram via LLM
+  generateArchitectureDiagram: (repoId: string, forceRegenerate: boolean = false) =>
+    request<ArchitectureDiagramResponse>('/api/analyzer/architecture-diagram', {
+      method: 'POST',
+      body: JSON.stringify({ repo_id: repoId, force_regenerate: forceRegenerate }),
+    }),
 
   // Chat - Create Session
   createChatSession: (repoId: string, clientId: string) =>
