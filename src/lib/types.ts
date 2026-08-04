@@ -187,3 +187,37 @@ export interface SendChatMessageResponse {
   fallback_triggered?: boolean;
   sources?: ChatMessageSource[];
 }
+
+export interface RepositoryItem {
+  id: string;
+  repo_url: string;
+  owner: string;
+  name: string;
+  language?: string | null;
+  stars?: number | null;
+  description?: string | null;
+  has_quick_summary: boolean;
+  has_deep_analysis: boolean;
+  updated_at?: string | null;
+}
+
+export interface RepositoryDetailsResponse {
+  id: string;
+  repo_url: string;
+  owner: string;
+  name: string;
+  quick_summary?: string | null;
+  metadata?: RepoMetadata | null;
+  brief?: DeepAnalysisBrief | null;
+  commit_sha?: string | null;
+}
+
+export interface ChatSessionItem {
+  id: string;
+  repo_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+
