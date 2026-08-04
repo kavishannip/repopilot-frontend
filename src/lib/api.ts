@@ -9,7 +9,12 @@ import {
   CreateChatSessionResponse,
   SendChatMessageResponse,
   ChatMessage,
+  RepositoryItem,
+  RepositoryDetailsResponse,
+  ChatSessionItem,
 } from './types';
+
+
 
 class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -22,6 +27,7 @@ async function getAccessToken(): Promise<string | null> {
   if (typeof window === 'undefined') return null;
   try {
     const auth = AsgardeoSPAClient.getInstance();
+    if (!auth) return null;
     const isAuthenticated = await auth.isAuthenticated();
     if (isAuthenticated) {
       // getIDToken() returns the OpenID Connect 3-segment RS256 JWT
@@ -39,6 +45,7 @@ async function getAccessToken(): Promise<string | null> {
   }
   return null;
 }
+
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -142,4 +149,20 @@ export const api = {
       method: 'DELETE',
       headers: { 'X-Client-ID': getClientId() },
     }),
+
+  // Chat - List User Sessions
+  listChatSessions: (repoId?: string) =>
+    request<ChatSessionItem[]>(`/api/chat/sessions${repoId ? `?repo_id=${repoId}` : ''}`, {
+      headers: { 'X-Client-ID': getClientId() },
+    }),
+
+  // User Scanned Repositories List
+
+  getRepositories: () =>
+    request<RepositoryItem[]>('/api/analyzer/repositories'),
+
+  // Get Single Repository Details
+  getRepository: (repoId: string) =>
+    request<RepositoryDetailsResponse>(`/api/analyzer/repository/${repoId}`),
 };
+
