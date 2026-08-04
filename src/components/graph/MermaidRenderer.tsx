@@ -96,24 +96,27 @@ export default function MermaidRenderer({ code, onRegenerate, isRegenerating }: 
 
   if (renderError) {
     return (
-      <div className="flex flex-col gap-3">
-        {/* Error state with raw code fallback */}
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-800/50 text-red-300 text-sm">
-          <p className="font-semibold mb-1">Diagram render error</p>
-          <p className="text-xs text-red-400">{renderError}</p>
+      <div className="flex flex-col items-center gap-4 py-8">
+        <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-amber-950/30 border border-amber-800/40 max-w-md w-full">
+          <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+            <RefreshCw className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-amber-200 text-sm font-semibold">Diagram Visualization Notice</p>
+            <p className="text-amber-300/80 text-xs mt-0.5 leading-relaxed">
+              There was an issue rendering this diagram structure. Click below to regenerate a clean diagram.
+            </p>
+          </div>
         </div>
-        <pre className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto">
-          {code}
-        </pre>
         {onRegenerate && (
           <button
             type="button"
             onClick={onRegenerate}
             disabled={isRegenerating}
-            className="self-start flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-medium hover:bg-indigo-600/30 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-md shadow-indigo-900/30 transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-50"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
-            Regenerate Diagram
+            <RefreshCw className={`h-4 w-4 ${isRegenerating ? 'animate-spin' : ''}`} />
+            <span>Regenerate Diagram</span>
           </button>
         )}
       </div>

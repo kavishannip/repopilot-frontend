@@ -87,22 +87,22 @@ export default function ArchitectureGraph() {
       {/* Error state */}
       {error && !hasData && (
         <div className="flex flex-col items-center gap-4 py-8">
-          <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-950/40 border border-red-800/50 max-w-md w-full">
-            <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-amber-950/30 border border-amber-800/40 max-w-md w-full">
+            <AlertCircle className="h-5 w-5 text-amber-400 flex-shrink-0" />
             <div>
-              <p className="text-red-300 text-xs font-semibold">Generation failed</p>
-              <p className="text-red-400/80 text-xs mt-0.5 break-words">
-                {error instanceof Error ? error.message : 'Unknown error occurred'}
+              <p className="text-amber-200 text-sm font-semibold">Diagram Generation Notice</p>
+              <p className="text-amber-300/80 text-xs mt-0.5 leading-relaxed">
+                There was a temporary issue generating the architecture diagram. Click below to try regenerating.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => generate(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-sm font-medium hover:bg-indigo-600/30 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-md shadow-indigo-900/30 transition-all duration-200 cursor-pointer active:scale-95"
           >
             <Sparkles className="h-4 w-4" />
-            Try Again
+            <span>Regenerate Diagram</span>
           </button>
         </div>
       )}
