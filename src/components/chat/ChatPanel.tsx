@@ -90,8 +90,8 @@ export default function ChatPanel() {
           category={isAnalyzing ? 'backend' : 'frontend'}
         />
       }
-      collapsible
     >
+
       <div className="space-y-4">
         {/* Analysis in Progress Warning Banner */}
         {isAnalyzing && (
