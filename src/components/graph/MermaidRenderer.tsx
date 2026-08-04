@@ -9,6 +9,30 @@ interface MermaidRendererProps {
   isRegenerating?: boolean;
 }
 
+function sanitizeMermaidCode(rawCode: string): string {
+  if (!rawCode) return rawCode;
+  let code = rawCode;
+
+  // Fix trailing > in arrow syntax like -->|HTTP|>
+  code = code.replace(/(-->\|[^|]+\|)>/g, '$1');
+
+  // Prevent Dagre "Setting X as parent of X would create a cycle" error
+  const matches = Array.from(code.matchAll(/subgraph\s+["']?([A-Za-z0-9_]+)["']?/g));
+  const subgraphs = new Set(matches.map((m) => m[1]));
+
+  subgraphs.forEach((sg) => {
+    const defRegex = new RegExp(`\\b${sg}\\b(?=\\s*[\\[\\(\\{])`, 'g');
+    if (defRegex.test(code)) {
+      const nodeAlias = `${sg}_Node`;
+      code = code.replace(new RegExp(`\\b${sg}\\b(?=\\s*[\\[\\(\\{])`, 'g'), nodeAlias);
+      code = code.replace(new RegExp(`\\b${sg}\\b(?=\\s*(-->|--|-\\.))`, 'g'), nodeAlias);
+      code = code.replace(new RegExp(`(-->|--|-\\.)(\\s*\\|[^|]+\\|)?\\s*\\b${sg}\\b`, 'g'), `$1$2 ${nodeAlias}`);
+    }
+  });
+
+  return code;
+}
+
 export default function MermaidRenderer({ code, onRegenerate, isRegenerating }: MermaidRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
@@ -26,6 +50,7 @@ export default function MermaidRenderer({ code, onRegenerate, isRegenerating }: 
 
         mermaid.initialize({
           startOnLoad: false,
+          suppressErrorRendering: true,
           theme: 'base',
           themeVariables: {
             // Dark background
@@ -57,13 +82,33 @@ export default function MermaidRenderer({ code, onRegenerate, isRegenerating }: 
 
         setRenderError(null);
 
+        const sanitizedCode = sanitizeMermaidCode(code);
+
+        // Pre-validate diagram syntax to catch errors cleanly without DOM injection
+        const isValid = await mermaid.parse(sanitizedCode).catch(() => false);
+        if (!isValid) {
+          document.querySelectorAll('[id^="dmermaid"], [id^="mermaid-"]').forEach((el) => el.remove());
+          throw new Error('Syntax error in diagram structure');
+        }
+
         const id = `mermaid-${Date.now()}`;
-        const { svg } = await mermaid.render(id, code);
+        const { svg } = await mermaid.render(id, sanitizedCode);
+
+        // Verify returned SVG does not contain raw syntax error text
+        if (svg.includes('Syntax error') || svg.includes('mermaid version')) {
+          document.querySelectorAll('[id^="dmermaid"], [id^="mermaid-"]').forEach((el) => el.remove());
+          throw new Error('Syntax error in diagram output');
+        }
+
         setSvgContent(svg);
       } catch (err) {
         console.error('Mermaid render error:', err);
+        // Remove any orphan error elements inserted into DOM by Mermaid
+        document.querySelectorAll('[id^="dmermaid"], [id^="mermaid-"], .error-icon').forEach((el) => el.remove());
+        setSvgContent('');
         setRenderError(err instanceof Error ? err.message : 'Failed to render diagram');
       }
+
     };
 
     renderDiagram();
