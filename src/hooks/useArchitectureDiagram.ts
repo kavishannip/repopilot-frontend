@@ -23,8 +23,9 @@ export function useArchitectureDiagram() {
     wasCached: mutation.data?.cached ?? Boolean(cached),
     isLoading: mutation.isPending,
     error: mutation.error,
-    generate: mutation.mutate,
+    generate: (forceRegenerate: boolean = false) => mutation.mutate(forceRegenerate),
     hasData: Boolean(mutation.data?.mermaid_code ?? cached?.mermaid_code),
     hasBeenAttempted: mutation.isSuccess || mutation.isError,
   };
+
 }

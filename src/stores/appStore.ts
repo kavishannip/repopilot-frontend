@@ -1,7 +1,13 @@
 import { create } from 'zustand';
-import { AppStep, DeepAnalysisBrief, QuickSummaryResponse } from '@/lib/types';
+import { AppStep, DeepAnalysisBrief, QuickSummaryResponse, RepositoryDetailsResponse } from '@/lib/types';
+
+export type DashboardTab = 'analyze' | 'repositories' | 'chat';
 
 interface AppState {
+  // Dashboard Active Tab State
+  activeTab: DashboardTab;
+  setActiveTab: (tab: DashboardTab) => void;
+
   // App Navigation Flow State
   currentStep: AppStep;
   setStep: (step: AppStep) => void;
@@ -30,11 +36,17 @@ interface AppState {
   sessionId: string | null;
   setSessionId: (id: string | null) => void;
 
+  // Load Saved Repository Details
+  loadRepositoryDetails: (details: RepositoryDetailsResponse) => void;
+
   // Global Reset
   reset: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  activeTab: 'analyze',
+  setActiveTab: (activeTab) => set({ activeTab }),
+
   currentStep: 'input',
   setStep: (currentStep) => set({ currentStep }),
 
@@ -59,6 +71,40 @@ export const useAppStore = create<AppState>((set) => ({
   sessionId: null,
   setSessionId: (sessionId) => set({ sessionId }),
 
+  loadRepositoryDetails: (details) => {
+    const qs: QuickSummaryResponse | null = details.quick_summary
+      ? {
+          repo_id: details.id,
+          repo_url: details.repo_url,
+          summary: details.quick_summary,
+          metadata: details.metadata || {},
+          cached: true,
+          cached_brief: details.brief || undefined,
+          commit_sha: details.commit_sha || undefined,
+        }
+      : null;
+
+    let step: AppStep = 'input';
+    if (details.brief) {
+      step = 'results';
+    } else if (qs) {
+      step = 'quick_summary';
+    }
+
+    set({
+      repoId: details.id,
+      repoUrl: details.repo_url,
+      quickSummary: qs,
+      deepAnalysisResult: details.brief || null,
+      currentStep: step,
+      activeTab: 'analyze',
+      jobId: null,
+      isRepoStale: false,
+      staleDiffSummary: null,
+      sessionId: null,
+    });
+  },
+
   reset: () =>
     set({
       currentStep: 'input',
@@ -72,3 +118,4 @@ export const useAppStore = create<AppState>((set) => ({
       sessionId: null,
     }),
 }));
+
