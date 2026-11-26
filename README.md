@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RepoPilot Frontend
 
-## Getting Started
+RepoPilot is an AI-powered application for exploring public GitHub repositories. This repository contains the web client; the companion [RepoPilot Backend](https://github.com/kavishannip/repopilot-backend) fetches repository data, runs analysis, stores searchable code context, and generates summaries and chat answers.
 
-First, run the development server:
+## What it does
+
+From the web app, users can:
+
+- Submit a public GitHub repository URL and get a quick overview based on repository metadata and key files.
+- Start a deeper, asynchronous analysis and view its progress and structured results, including the architecture, components, technologies, entry points, and potential issues.
+- View an AI-generated Mermaid architecture diagram.
+- Ask questions about a repository in a persistent, repository-specific chat session.
+- Check whether a repository has changed and request a sync.
+
+## How the application works
+
+1. The user enters a GitHub URL on the Analyze page. The client validates the URL and sends it to the backend quick-summary API.
+2. The backend returns a summary and repository ID. The client uses that ID to request deep analysis, if selected.
+3. Deep analysis runs in a backend background task. The frontend polls the job-status endpoint and displays progress and the completed report.
+4. The frontend can request an architecture diagram or open a repository chat. For chat, it sends the session and question to the backend; the backend retrieves relevant indexed code and generates an answer grounded in repository context.
+5. The client also exposes repository history and update/sync actions backed by the API.
+
+The UI is built with Next.js App Router, React, and TypeScript. TanStack Query handles API requests and polling, Zustand holds client-side app state, and Asgardeo provides authentication. API calls are centralized in `src/lib/api.ts` and use the configured API base URL.
+
+## Requirements
+
+- Node.js and npm (or pnpm)
+- A running RepoPilot Backend. See its README for backend, PostgreSQL/pgvector, and AI-provider configuration.
+- Asgardeo application configuration for authenticated use
+
+## Getting started
+
+Install dependencies and run the local development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+By default, the client calls the backend at `http://localhost:5000`. To use another backend URL, set the public environment variable before starting the app:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
 
-## Learn More
+For local development, create a `.env.local` file in the project root and set `NEXT_PUBLIC_API_URL` there. Configure the backend's Asgardeo settings to match your authentication application.
 
-To learn more about Next.js, take a look at the following resources:
+## Useful commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev    # Start the development server
+npm run lint   # Run ESLint
+npm run build  # Build the production app
+npm run start  # Serve the production build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+- `src/app/` — Analyze, chat, and repository routes
+- `src/components/` — UI components for repository input, analysis results, diagrams, and chat
+- `src/hooks/` — Query and mutation hooks for backend operations
+- `src/lib/api.ts` — Typed API client for the backend
+- `src/stores/` — Client-side application state
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Related repository
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [RepoPilot Backend](https://github.com/kavishannip/repopilot-backend) — FastAPI analysis, indexing, persistence, and chat services
